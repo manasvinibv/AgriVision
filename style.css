@@ -1,0 +1,731 @@
+/* RESET */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+
+/* BODY */
+
+body{
+font-family:'Segoe UI',sans-serif;
+min-height:100vh;
+overflow-x:hidden;
+color:white;
+transition:background 0.5s ease;
+}
+
+
+/* ========================= */
+/* SIDEBAR */
+/* ========================= */
+
+nav{
+position:fixed;
+left:0;
+top:10vh;
+width:10vw;
+min-width:180px;
+height:100vh;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+
+/* MENU ITEMS */
+
+nav a{
+
+width:90%;
+
+padding:15px;
+
+margin:10px 0;
+
+border-radius:12px;
+
+text-decoration:none;
+
+color:white;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:0.35s;
+
+text-align:left;
+
+padding-left:20px;
+
+}
+
+
+/* HOVER */
+
+nav a:hover{
+
+background:
+linear-gradient(
+to right,
+#00c6ff,
+#0072ff
+);
+
+transform:
+translateX(8px);
+
+box-shadow:
+0 0 15px
+rgba(0,198,255,.5);
+
+}
+
+
+/* ACTIVE */
+
+nav a.active{
+
+background:
+linear-gradient(
+to right,
+#00c6ff,
+#0072ff
+);
+
+transform:
+translateX(8px);
+
+box-shadow:
+0 0 15px
+rgba(0,198,255,.5);
+
+}
+
+
+/* ========================= */
+/* PAGE */
+/* ========================= */
+
+.page{
+
+display:none;
+
+opacity:0;
+
+transform:
+translateY(20px);
+
+transition:.4s;
+
+margin-left:12vw;
+
+padding:30px;
+
+}
+
+
+.page.active{
+
+display:block;
+
+opacity:1;
+
+transform:
+translateY(0);
+
+}
+
+
+/* ========================= */
+/* DASHBOARD */
+/* ========================= */
+
+.container{
+
+background:
+rgba(255,255,255,0.15);
+
+backdrop-filter:
+blur(12px);
+
+padding:30px;
+
+margin:40px auto;
+
+width:550px;
+
+border-radius:20px;
+
+text-align:center;
+
+box-shadow:
+0 10px 30px
+rgba(0,0,0,.4);
+
+transition:.3s;
+
+}
+
+
+.container:hover{
+
+transform:
+scale(1.01);
+
+}
+
+
+/* ========================= */
+/* SENSOR GRID */
+/* ========================= */
+
+.grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(3,1fr);
+
+gap:15px;
+
+margin-top:20px;
+
+}
+
+
+/* SENSOR BOX */
+
+.box{
+
+background:
+rgba(255,255,255,.2);
+
+padding:18px;
+
+border-radius:12px;
+
+transition:.3s;
+
+}
+
+
+.box:hover{
+
+transform:
+translateY(-8px);
+
+background:
+rgba(255,255,255,.3);
+
+box-shadow:
+0 8px 18px
+rgba(0,0,0,.3);
+
+}
+
+
+.box p{
+
+font-size:15px;
+
+margin-bottom:10px;
+
+}
+
+
+.box div{
+
+font-size:24px;
+
+font-weight:bold;
+
+}
+
+
+/* ========================= */
+/* BUTTON */
+/* ========================= */
+
+button{
+
+margin-top:25px;
+
+padding:14px;
+
+width:100%;
+
+background:
+linear-gradient(
+to right,
+#00c6ff,
+#0072ff
+);
+
+color:white;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-size:16px;
+
+transition:.3s;
+
+}
+
+
+button:hover{
+
+transform:
+scale(1.05);
+
+box-shadow:
+0 0 18px
+rgba(0,114,255,.5);
+
+}
+
+
+/* ========================= */
+/* SECTION */
+/* ========================= */
+
+.section{
+
+margin-left:12vw;
+
+margin-top:30px;
+
+margin-right:30px;
+
+padding:30px;
+
+background:
+rgba(255,255,255,.15);
+
+backdrop-filter:
+blur(10px);
+
+border-radius:20px;
+
+box-shadow:
+0 8px 25px
+rgba(0,0,0,.35);
+
+}
+
+
+/* ========================= */
+/* TABLE */
+/* ========================= */
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:white;
+
+color:black;
+
+border-radius:10px;
+
+overflow:hidden;
+
+}
+
+
+td,th{
+
+padding:12px;
+
+border-bottom:
+1px solid #ddd;
+
+text-align:center;
+
+}
+
+
+th{
+
+background:#0072ff;
+
+color:white;
+
+}
+
+
+/* ========================= */
+/* GRAPH */
+/* ========================= */
+
+canvas{
+
+width:100%!important;
+
+height:500px!important;
+
+background:white;
+
+padding:20px;
+
+border-radius:15px;
+
+}
+
+
+/* ========================= */
+/* HEADINGS */
+/* ========================= */
+
+h2,h3{
+
+margin-bottom:20px;
+
+}
+
+
+h1{
+
+text-align:center;
+
+margin-bottom:20px;
+
+}
+
+
+/* ========================= */
+/* ALERT */
+/* ========================= */
+
+#alertText{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#ffeb3b;
+
+}
+
+
+/* ========================= */
+/* HEALTH */
+/* ========================= */
+
+#healthText{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#90ee90;
+
+}
+
+
+/* ================================================= */
+/* MARKET INPUTS */
+/* ================================================= */
+
+.market-inputs{
+
+display:grid;
+
+grid-template-columns:
+repeat(3,1fr);
+
+gap:18px;
+
+margin-top:20px;
+
+}
+
+
+.input-group{
+
+display:flex;
+
+flex-direction:column;
+
+gap:8px;
+
+}
+
+
+.input-group label{
+
+font-weight:600;
+
+font-size:15px;
+
+}
+
+
+.input-group input{
+
+padding:13px;
+
+border:none;
+
+border-radius:10px;
+
+font-size:15px;
+
+outline:none;
+
+background:
+rgba(255,255,255,.9);
+
+color:#222;
+
+}
+
+
+.input-group input:focus{
+
+box-shadow:
+0 0 10px
+rgba(0,198,255,.7);
+
+}
+
+
+/* ================================================= */
+/* MARKET GRID */
+/* ================================================= */
+
+.market-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(3,1fr);
+
+gap:18px;
+
+margin-top:25px;
+
+}
+
+
+/* MARKET CARD */
+
+.market-card{
+
+background:
+rgba(255,255,255,.18);
+
+padding:20px;
+
+border-radius:14px;
+
+text-align:center;
+
+transition:.3s;
+
+box-shadow:
+0 5px 15px
+rgba(0,0,0,.2);
+
+}
+
+
+.market-card:hover{
+
+transform:
+translateY(-5px);
+
+background:
+rgba(255,255,255,.25);
+
+}
+
+
+.market-card p{
+
+font-size:14px;
+
+margin-bottom:10px;
+
+font-weight:600;
+
+}
+
+
+.market-card div{
+
+font-size:21px;
+
+font-weight:bold;
+
+}
+
+
+/* ACTUAL MODAL */
+
+.market-card.highlight{
+
+border:
+2px solid
+rgba(255,255,255,.5);
+
+}
+
+
+/* XGBOOST */
+
+.market-card.prediction{
+
+border:
+2px solid
+#00c6ff;
+
+background:
+rgba(0,114,255,.25);
+
+}
+
+
+#predictedPrice{
+
+font-size:28px;
+
+font-weight:bold;
+
+}
+
+
+/* MARKET STATUS */
+
+#marketStatus{
+
+margin-top:20px;
+
+text-align:center;
+
+font-weight:600;
+
+}
+
+
+/* ================================================= */
+/* SMOOTH SCROLL */
+/* ================================================= */
+
+html{
+
+scroll-behavior:smooth;
+
+}
+
+
+/* ================================================= */
+/* RESPONSIVE */
+/* ================================================= */
+
+@media(max-width:900px){
+
+nav{
+
+width:150px;
+
+min-width:150px;
+
+}
+
+
+.page{
+
+margin-left:160px;
+
+}
+
+
+.section{
+
+margin-left:0;
+
+}
+
+
+.market-inputs{
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+
+.market-grid{
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+}
+
+
+@media(max-width:600px){
+
+nav{
+
+position:relative;
+
+top:0;
+
+width:100%;
+
+height:auto;
+
+}
+
+
+.page{
+
+margin-left:0;
+
+}
+
+
+.container{
+
+width:95%;
+
+}
+
+
+.grid{
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+
+.market-inputs{
+
+grid-template-columns:
+1fr;
+
+}
+
+
+.market-grid{
+
+grid-template-columns:
+1fr;
+
+}
+
+}

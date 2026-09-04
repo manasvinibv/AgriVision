@@ -2,9 +2,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import time
 import os
-import subprocess
 import joblib
 import pandas as pd
+import subprocess
 
 from urllib.parse import urlencode, urlparse, parse_qs
 from datetime import datetime
@@ -14,13 +14,11 @@ from datetime import datetime
 # DATA.GOV.IN API
 # ============================================================
 
-# PUT YOUR CURRENT WORKING / AUTHORIZED API KEY HERE
-API_KEY = "PUT_YOUR_WORKING_API_KEY_HERE"
+API_KEY = "579b464db66ec23bdd000001a45abb90b19d48db76e87f2a09caffb2"
 
-API_URL = (
-    "https://api.data.gov.in/resource/"
-    "35985678-0d79-46b4-9ed6-6f13308a1d24"
-)
+RESOURCE_ID = "35985678-0d79-46b4-9ed6-6f13308a1d24"
+
+API_URL = f"https://api.data.gov.in/resource/{RESOURCE_ID}"
 
 
 # ============================================================
@@ -32,7 +30,7 @@ MARKET_FEATURES_FILE = "market_price_features.pkl"
 
 
 # ============================================================
-# LOAD MARKET PRICE MODEL
+# LOAD XGBOOST MODEL
 # ============================================================
 
 market_price_model = None
@@ -56,46 +54,45 @@ try:
 
 except Exception as error:
 
-    print()
-    print("WARNING")
-    print("Market price model could not be loaded.")
+    print("WARNING: Market model could not be loaded.")
     print(error)
-    print()
 
 
 # ============================================================
 # SENSOR DATA
 # ============================================================
 
-# IMPORTANT:
-# None means "no data".
-# We do NOT use 0 as fake/default sensor data.
-
 latest_data = {
+
     "moisture": None,
     "temperature": None,
     "ph": None,
     "n": None,
     "p": None,
     "k": None
+
 }
 
 last_update_time = None
 
 
 # ============================================================
-# SENSOR DATA VALIDATION
+# SENSOR VALIDATION
 # ============================================================
 
 def sensor_data_available():
 
     required = [
         "moisture",
+        "temperature",
         "ph",
         "n",
         "p",
         "k"
     ]
+
+    if last_update_time is None:
+        return False
 
     for field in required:
 
@@ -105,12 +102,8 @@ def sensor_data_available():
             return False
 
         try:
-
-            if float(value) <= 0:
-                return False
-
+            float(value)
         except:
-
             return False
 
     return True
@@ -122,99 +115,62 @@ def sensor_data_available():
 
 def recommend(data):
 
-    # We are NOT returning fake crops.
-    #
-    # Your crop_model.pkl is already present, but we have not
-    # established its exact input feature structure in this
-    # conversation.
-    #
-    # Therefore we do not invent a prediction.
+    # Keep your existing crop recommendation
+    # implementation here if already connected.
 
     return []
 
 
 # ============================================================
-# DATA.GOV.IN MARKET API
+# MARKET API
 # ============================================================
 
-def get_market_data(
-    crop,
-    state,
-    district
-):
+def get_market_data(commodity, state, district):
 
-    # --------------------------------------------------------
-    # DO NOT ALLOW EMPTY INPUT
-    # --------------------------------------------------------
-
-    if not crop or not state or not district:
-
-        return {
-            "status": "no_data",
-            "message":
-                "State, district and commodity are required."
-        }
-
-    # --------------------------------------------------------
-    # API KEY CHECK
-    # --------------------------------------------------------
-
-    if (
-        not API_KEY or
-        API_KEY == "PUT_YOUR_WORKING_API_KEY_HERE"
-    ):
-
+    if not commodity or not state or not district:
         return {
             "status": "error",
-            "message":
-                "API key has not been configured in server.py."
+            "message": "State, District and Commodity are required."
         }
 
-    print()
-    print("==============================================")
-    print("MARKET API REQUEST")
-    print("==============================================")
-    print("State    :", state)
-    print("District :", district)
-    print("Commodity:", crop)
-    print()
+    print("\n==========================================")
+    print("DATA.GOV.IN MARKET REQUEST")
+    print("==========================================")
+    print("State     :", state)
+    print("District  :", district)
+    print("Commodity :", commodity)
 
-    # --------------------------------------------------------
-    # PARAMETERS
-    # --------------------------------------------------------
+    # ---------------------------------------------------------
+    # Try API with all 3 filters first
+    # ---------------------------------------------------------
 
     params = [
         ("api-key", API_KEY),
         ("format", "json"),
-        ("limit", "100"),
+        ("limit", "1000"),
         ("filters[State]", state),
         ("filters[District]", district),
-        ("filters[Commodity]", crop)
+        ("filters[Commodity]", commodity)
     ]
 
     url = API_URL + "?" + urlencode(params)
 
     try:
 
-        # ----------------------------------------------------
-        # CURL
-        # ----------------------------------------------------
-
         result = subprocess.run(
             [
                 "curl",
-                "-s",
-                "--max-time",
-                "60",
+                "-sS",
+                "--connect-timeout", "15",
+                "--max-time", "120",
+                "-H", "Accept: application/json",
                 url
             ],
             capture_output=True,
             text=True
         )
 
-        # ----------------------------------------------------
-        # CURL ERROR
-        # ----------------------------------------------------
+        print("CURL RETURN CODE:", result.returncode)
 
         if result.returncode != 0:
 
@@ -223,8 +179,7 @@ def get_market_data(
 
             return {
                 "status": "error",
-                "message":
-                    "Could not connect to data.gov.in."
+                "message": "Could not connect to data.gov.in."
             }
 
         raw_response = result.stdout.strip()
@@ -233,63 +188,133 @@ def get_market_data(
 
             return {
                 "status": "error",
-                "message":
-                    "data.gov.in returned an empty response."
+                "message": "data.gov.in returned an empty response."
             }
-
-        # ----------------------------------------------------
-        # JSON
-        # ----------------------------------------------------
 
         try:
 
-            data = json.loads(
-                raw_response
-            )
+            data = json.loads(raw_response)
 
         except json.JSONDecodeError:
 
-            print("Invalid API response:")
-            print(raw_response[:1000])
+            print("INVALID JSON:")
+            print(raw_response[:2000])
 
             return {
                 "status": "error",
-                "message":
-                    "data.gov.in did not return valid JSON."
+                "message": "Invalid response received from data.gov.in."
             }
-
-        # ----------------------------------------------------
-        # API ERROR
-        # ----------------------------------------------------
 
         if "error" in data:
 
-            print(
-                "DATA.GOV.IN ERROR:",
-                data["error"]
-            )
+            print("API ERROR:", data["error"])
 
             return {
                 "status": "error",
-                "message":
-                    data["error"]
+                "message": str(data["error"])
             }
 
-        # ----------------------------------------------------
-        # RECORDS
-        # ----------------------------------------------------
+        records = data.get("records", [])
 
-        records = data.get(
-            "records",
-            []
-        )
+        print("Records returned by API:", len(records))
+
+        # ---------------------------------------------------------
+        # If API returned records, verify them locally
+        # ---------------------------------------------------------
+
+        def clean(value):
+            return " ".join(
+                str(value or "").strip().lower().split()
+            )
+
+        wanted_state = clean(state)
+        wanted_district = clean(district)
+        wanted_commodity = clean(commodity)
+
+        matched = []
+
+        for record in records:
+
+            record_state = clean(
+                record.get("State")
+            )
+
+            record_district = clean(
+                record.get("District")
+            )
+
+            record_commodity = clean(
+                record.get("Commodity")
+            )
+
+            if (
+                record_state == wanted_state
+                and
+                record_district == wanted_district
+                and
+                record_commodity == wanted_commodity
+            ):
+
+                matched.append(record)
+
+        # ---------------------------------------------------------
+        # Partial commodity match
+        # ---------------------------------------------------------
+
+        if not matched:
+
+            for record in records:
+
+                record_state = clean(
+                    record.get("State")
+                )
+
+                record_district = clean(
+                    record.get("District")
+                )
+
+                record_commodity = clean(
+                    record.get("Commodity")
+                )
+
+                if (
+                    record_state == wanted_state
+                    and
+                    record_district == wanted_district
+                    and
+                    (
+                        wanted_commodity in record_commodity
+                        or
+                        record_commodity in wanted_commodity
+                    )
+                ):
+
+                    matched.append(record)
 
         print(
-            "Records received:",
-            len(records)
+            "Matching records:",
+            len(matched)
         )
 
-        if not records:
+        if not matched:
+
+            available = sorted(
+                set(
+                    str(
+                        r.get("Commodity", "")
+                    ).strip()
+                    for r in records
+                    if r.get("Commodity")
+                )
+            )
+
+            print(
+                "Commodities returned by API:"
+            )
+
+            print(
+                available[:100]
+            )
 
             return {
                 "status": "no_data",
@@ -297,23 +322,20 @@ def get_market_data(
                     "No market records found for the selected State, District and Commodity."
             }
 
-        # ----------------------------------------------------
-        # SORT RECORDS BY DATE
-        # ----------------------------------------------------
+        # ---------------------------------------------------------
+        # Sort newest first
+        # ---------------------------------------------------------
 
         def get_date(record):
 
-            date_text = record.get(
+            value = record.get(
                 "Arrival_Date"
             )
-
-            if not date_text:
-                return datetime.min
 
             try:
 
                 return datetime.strptime(
-                    date_text,
+                    str(value),
                     "%d/%m/%Y"
                 )
 
@@ -321,143 +343,216 @@ def get_market_data(
 
                 return datetime.min
 
-        records.sort(
+        matched.sort(
             key=get_date,
             reverse=True
         )
 
-        # ----------------------------------------------------
-        # LATEST VALID RECORD
-        # ----------------------------------------------------
+        latest = matched[0]
 
-        latest = None
+        # ---------------------------------------------------------
+        # Extract prices
+        # ---------------------------------------------------------
 
-        for record in records:
+        min_prices = []
+        max_prices = []
+        modal_prices = []
 
-            if record.get("Arrival_Date"):
+        for record in matched:
 
-                latest = record
-                break
+            try:
 
-        if latest is None:
+                value = float(
+                    str(
+                        record.get("Min_Price", "")
+                    ).replace(",", "")
+                )
 
-            return {
-                "status": "no_data",
-                "message":
-                    "Market records were returned, but no valid arrival date was found."
-            }
+                if value > 0:
+                    min_prices.append(value)
 
-        # ----------------------------------------------------
-        # REQUIRED PRICE FIELDS
-        # ----------------------------------------------------
+            except:
 
-        min_price = pd.to_numeric(
-            latest.get("Min_Price"),
-            errors="coerce"
-        )
+                pass
 
-        max_price = pd.to_numeric(
-            latest.get("Max_Price"),
-            errors="coerce"
-        )
+            try:
 
-        modal_price = pd.to_numeric(
-            latest.get("Modal_Price"),
-            errors="coerce"
-        )
+                value = float(
+                    str(
+                        record.get("Max_Price", "")
+                    ).replace(",", "")
+                )
 
-        # We need valid price information.
+                if value > 0:
+                    max_prices.append(value)
+
+            except:
+
+                pass
+
+            try:
+
+                value = float(
+                    str(
+                        record.get("Modal_Price", "")
+                    ).replace(",", "")
+                )
+
+                if value > 0:
+                    modal_prices.append(value)
+
+            except:
+
+                pass
+
         if (
-            pd.isna(min_price) or
-            pd.isna(max_price) or
-            pd.isna(modal_price)
+            not min_prices
+            or
+            not max_prices
+            or
+            not modal_prices
         ):
 
             return {
                 "status": "no_data",
                 "message":
-                    "Latest market record does not contain valid price values."
+                    "Market records found, but price values are missing."
             }
 
-        # ----------------------------------------------------
-        # RETURN ACTUAL MARKET RECORD
-        # ----------------------------------------------------
+        # ---------------------------------------------------------
+        # Calculate values
+        # ---------------------------------------------------------
 
-        market_data = {
+        minimum_price = min(
+            min_prices
+        )
+
+        maximum_price = max(
+            max_prices
+        )
+
+        average_price = sum(
+            modal_prices
+        ) / len(modal_prices)
+
+        # ---------------------------------------------------------
+        # Helper
+        # ---------------------------------------------------------
+
+        def convert_price(value):
+
+            try:
+
+                return float(
+                    str(value).replace(",", "")
+                )
+
+            except:
+
+                return None
+
+        # ---------------------------------------------------------
+        # Return
+        # ---------------------------------------------------------
+
+        result = {
 
             "status": "ok",
 
             "date":
                 latest.get(
-                    "Arrival_Date"
+                    "Arrival_Date",
+                    "--"
                 ),
 
             "commodity":
                 latest.get(
-                    "Commodity"
+                    "Commodity",
+                    commodity
                 ),
 
             "state":
                 latest.get(
-                    "State"
+                    "State",
+                    state
                 ),
 
             "district":
                 latest.get(
-                    "District"
+                    "District",
+                    district
                 ),
 
             "market":
                 latest.get(
-                    "Market"
+                    "Market",
+                    "--"
                 ),
 
             "variety":
                 latest.get(
-                    "Variety"
+                    "Variety",
+                    "--"
                 ),
 
             "grade":
                 latest.get(
-                    "Grade"
+                    "Grade",
+                    "--"
                 ),
 
             "min_price":
-                float(min_price),
+                round(
+                    minimum_price,
+                    2
+                ),
 
             "max_price":
-                float(max_price),
+                round(
+                    maximum_price,
+                    2
+                ),
+
+            "average_price":
+                round(
+                    average_price,
+                    2
+                ),
 
             "modal_price":
-                float(modal_price)
+                convert_price(
+                    latest.get("Modal_Price")
+                ),
+
+            "record_count":
+                len(matched),
+
+            "model_min_price":
+                convert_price(
+                    latest.get("Min_Price")
+                ),
+
+            "model_max_price":
+                convert_price(
+                    latest.get("Max_Price")
+                )
         }
 
-        print()
-        print("LATEST MARKET RECORD")
-        print("--------------------")
-        print(
-            "Date:",
-            market_data["date"]
-        )
-        print(
-            "Commodity:",
-            market_data["commodity"]
-        )
-        print(
-            "Market:",
-            market_data["market"]
-        )
-        print(
-            "Modal price:",
-            market_data["modal_price"]
-        )
+        print("\n==========================================")
+        print("MARKET RESULT")
+        print("==========================================")
+        print("Records :", result["record_count"])
+        print("Minimum :", result["min_price"])
+        print("Maximum :", result["max_price"])
+        print("Average :", result["average_price"])
+        print("Modal   :", result["modal_price"])
+        print("Date    :", result["date"])
 
-        return market_data
+        return result
 
     except Exception as error:
 
-        print()
-        print("MARKET API ERROR:")
+        print("\nMARKET API ERROR:")
         print(error)
 
         return {
@@ -465,9 +560,8 @@ def get_market_data(
             "message": str(error)
         }
 
-
 # ============================================================
-# XGBOOST MARKET PRICE PREDICTION
+# XGBOOST PREDICTION
 # ============================================================
 
 def predict_market_price(
@@ -477,24 +571,28 @@ def predict_market_price(
     if market_price_model is None:
 
         return {
+
             "status": "error",
+
             "message":
                 "Market price model is not loaded."
+
         }
 
-    if not market_price_features:
+
+    if market_price_features is None:
 
         return {
+
             "status": "error",
+
             "message":
-                "Market model feature file is not loaded."
+                "Market model features are not loaded."
+
         }
 
-    try:
 
-        # ----------------------------------------------------
-        # READ ACTUAL MARKET DATA
-        # ----------------------------------------------------
+    try:
 
         arrival_date = market_data.get(
             "date"
@@ -524,55 +622,19 @@ def predict_market_price(
             "grade"
         )
 
-        min_price = pd.to_numeric(
-            market_data.get(
-                "min_price"
-            ),
-            errors="coerce"
+
+        min_price = market_data.get(
+            "model_min_price"
         )
 
-        max_price = pd.to_numeric(
-            market_data.get(
-                "max_price"
-            ),
-            errors="coerce"
+        max_price = market_data.get(
+            "model_max_price"
         )
 
-        # ----------------------------------------------------
-        # REQUIRED VALUES
-        # ----------------------------------------------------
 
-        required_values = {
-            "Arrival_Date": arrival_date,
-            "Commodity": commodity,
-            "District": district,
-            "Market": market,
-            "State": state,
-            "Variety": variety,
-            "Grade": grade
-        }
-
-        for name, value in required_values.items():
-
-            if value is None or str(value).strip() == "":
-
-                return {
-                    "status": "no_data",
-                    "message":
-                        f"Missing required model input: {name}"
-                }
-
-        if pd.isna(min_price) or pd.isna(max_price):
-
-            return {
-                "status": "no_data",
-                "message":
-                    "Minimum or maximum market price is missing."
-            }
-
-        # ----------------------------------------------------
+        # ====================================================
         # DATE
-        # ----------------------------------------------------
+        # ====================================================
 
         parsed_date = pd.to_datetime(
             arrival_date,
@@ -580,140 +642,162 @@ def predict_market_price(
             errors="coerce"
         )
 
+
         if pd.isna(parsed_date):
 
             return {
-                "status": "no_data",
+
+                "status": "error",
+
                 "message":
                     "Invalid market arrival date."
-            }
-
-        # ----------------------------------------------------
-        # CREATE SAME FEATURES USED DURING TRAINING
-        # ----------------------------------------------------
-
-        row = pd.DataFrame([
-            {
-
-                "Commodity":
-                    commodity,
-
-                "District":
-                    district,
-
-                "Market":
-                    market,
-
-                "State":
-                    state,
-
-                "Variety":
-                    variety,
-
-                "Grade":
-                    grade,
-
-                "Min_Price":
-                    float(min_price),
-
-                "Max_Price":
-                    float(max_price),
-
-                "Year":
-                    parsed_date.year,
-
-                "Month":
-                    parsed_date.month,
-
-                "Day":
-                    parsed_date.day,
-
-                "DayOfWeek":
-                    parsed_date.dayofweek
 
             }
-        ])
 
-        # ----------------------------------------------------
-        # ONE HOT ENCODING
-        # ----------------------------------------------------
+
+        # ====================================================
+        # CREATE INPUT ROW
+        # ====================================================
+
+        row = pd.DataFrame([{
+
+            "Commodity":
+                commodity,
+
+            "District":
+                district,
+
+            "Market":
+                market,
+
+            "State":
+                state,
+
+            "Variety":
+                variety,
+
+            "Grade":
+                grade,
+
+            "Min_Price":
+                float(min_price),
+
+            "Max_Price":
+                float(max_price),
+
+            "Year":
+                parsed_date.year,
+
+            "Month":
+                parsed_date.month,
+
+            "Day":
+                parsed_date.day,
+
+            "DayOfWeek":
+                parsed_date.dayofweek
+
+        }])
+
+
+        # ====================================================
+        # CATEGORICAL COLUMNS
+        # ====================================================
 
         categorical_columns = [
+
             "Commodity",
             "District",
             "Market",
             "State",
             "Variety",
             "Grade"
+
         ]
 
+
         row = pd.get_dummies(
+
             row,
+
             columns=categorical_columns,
+
             dummy_na=True
+
         )
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # MATCH TRAINING FEATURES
-        # ----------------------------------------------------
+        # ====================================================
 
         row = row.reindex(
+
             columns=market_price_features,
+
             fill_value=0
+
         )
+
 
         row = row.fillna(0)
 
-        # ----------------------------------------------------
-        # PREDICT
-        # ----------------------------------------------------
+
+        # ====================================================
+        # XGBOOST PREDICTION
+        # ====================================================
 
         prediction = market_price_model.predict(
             row
         )[0]
 
+
         prediction = float(
             prediction
         )
 
-        # Never display a negative price.
+
         if prediction < 0:
 
-            return {
-                "status": "error",
-                "message":
-                    "Model returned an invalid negative price."
-            }
+            prediction = 0
 
-        print()
+
         print(
-            "XGBoost predicted modal price:",
+            "XGBoost Predicted Price:",
             prediction
         )
 
+
         return {
+
             "status": "ok",
+
             "predicted_modal_price":
                 round(
                     prediction,
                     2
                 )
+
         }
+
 
     except Exception as error:
 
-        print()
         print("XGBOOST ERROR:")
         print(error)
 
         return {
+
             "status": "error",
-            "message": str(error)
+
+            "message":
+                str(error)
+
         }
 
 
 # ============================================================
-# SEND JSON RESPONSE
+# SEND JSON
 # ============================================================
 
 def send_json(
@@ -739,10 +823,12 @@ def send_json(
     handler.end_headers()
 
     handler.wfile.write(
+
         json.dumps(
             response,
             ensure_ascii=False
         ).encode("utf-8")
+
     )
 
 
@@ -771,9 +857,10 @@ class Handler(
             parsed.query
         )
 
-        # ----------------------------------------------------
-        # HOME
-        # ----------------------------------------------------
+
+        # ====================================================
+        # INDEX
+        # ====================================================
 
         if path == "/":
 
@@ -785,6 +872,7 @@ class Handler(
                 ) as f:
 
                     content = f.read()
+
 
                 self.send_response(200)
 
@@ -799,6 +887,7 @@ class Handler(
                     content
                 )
 
+
             except Exception as error:
 
                 self.send_error(
@@ -806,9 +895,10 @@ class Handler(
                     str(error)
                 )
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # CSS
-        # ----------------------------------------------------
+        # ====================================================
 
         elif path == "/style.css":
 
@@ -820,6 +910,7 @@ class Handler(
                 ) as f:
 
                     content = f.read()
+
 
                 self.send_response(200)
 
@@ -834,6 +925,7 @@ class Handler(
                     content
                 )
 
+
             except Exception as error:
 
                 self.send_error(
@@ -841,9 +933,10 @@ class Handler(
                     str(error)
                 )
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # IMAGES
-        # ----------------------------------------------------
+        # ====================================================
 
         elif path.startswith(
             "/images/"
@@ -851,39 +944,34 @@ class Handler(
 
             file_path = path.lstrip("/")
 
+
             if not os.path.exists(
                 file_path
             ):
 
-                self.send_error(
-                    404
-                )
+                self.send_error(404)
 
                 return
+
 
             if file_path.endswith(
                 ".jpg"
             ):
 
-                content_type = (
-                    "image/jpeg"
-                )
+                content_type = "image/jpeg"
 
             elif file_path.endswith(
                 ".png"
             ):
 
-                content_type = (
-                    "image/png"
-                )
+                content_type = "image/png"
 
             else:
 
-                self.send_error(
-                    404
-                )
+                self.send_error(404)
 
                 return
+
 
             with open(
                 file_path,
@@ -891,6 +979,7 @@ class Handler(
             ) as f:
 
                 content = f.read()
+
 
             self.send_response(200)
 
@@ -905,133 +994,136 @@ class Handler(
                 content
             )
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # SENSOR DATA
-        # ----------------------------------------------------
+        # ====================================================
 
         elif path == "/data":
 
             if not sensor_data_available():
 
                 send_json(
+
                     self,
+
                     {
-                        "status": "no_data",
+
+                        "status":
+                            "no_data",
+
                         "message":
                             "Waiting for valid sensor data."
+
                     }
+
                 )
 
                 return
 
+
             response = {
 
-                "status": "ok",
+                "status":
+                    "ok",
 
                 "moisture":
-                    latest_data[
-                        "moisture"
-                    ],
+                    latest_data["moisture"],
 
                 "temperature":
-                    latest_data[
-                        "temperature"
-                    ],
+                    latest_data["temperature"],
 
                 "ph":
-                    latest_data[
-                        "ph"
-                    ],
+                    latest_data["ph"],
 
                 "n":
-                    latest_data[
-                        "n"
-                    ],
+                    latest_data["n"],
 
                 "p":
-                    latest_data[
-                        "p"
-                    ],
+                    latest_data["p"],
 
                 "k":
-                    latest_data[
-                        "k"
-                    ],
+                    latest_data["k"],
 
                 "crops":
                     recommend(
                         latest_data
                     )
+
             }
+
 
             send_json(
                 self,
                 response
             )
 
-        # ----------------------------------------------------
-        # MARKET PRICE + XGBOOST
-        # ----------------------------------------------------
+
+        # ====================================================
+        # MARKET PRICE
+        # ====================================================
 
         elif path == "/market-predict":
 
-            # IMPORTANT:
-            # There are NO default values.
+            state = query.get(
+                "state",
+                [""]
+            )[0].strip()
 
-            state = (
-                query.get(
-                    "state",
-                    [""]
-                )[0]
-                .strip()
-            )
 
-            district = (
-                query.get(
-                    "district",
-                    [""]
-                )[0]
-                .strip()
-            )
+            district = query.get(
+                "district",
+                [""]
+            )[0].strip()
 
-            crop = (
-                query.get(
-                    "commodity",
-                    [""]
-                )[0]
-                .strip()
-            )
 
-            # -----------------------------------------------
-            # VALIDATE USER INPUT
-            # -----------------------------------------------
+            commodity = query.get(
+                "commodity",
+                [""]
+            )[0].strip()
+
+
+            # =================================================
+            # VALIDATE
+            # =================================================
 
             if (
                 not state or
                 not district or
-                not crop
+                not commodity
             ):
 
                 send_json(
+
                     self,
+
                     {
-                        "status": "no_data",
+
+                        "status":
+                            "error",
+
                         "message":
                             "Please enter State, District and Commodity."
+
                     }
+
                 )
 
                 return
 
-            # -----------------------------------------------
-            # GET ACTUAL API DATA
-            # -----------------------------------------------
+
+            # =================================================
+            # GET DATA FROM DATA.GOV.IN
+            # =================================================
 
             market_data = get_market_data(
-                crop,
+
+                commodity,
                 state,
                 district
+
             )
+
 
             if market_data.get(
                 "status"
@@ -1044,30 +1136,39 @@ class Handler(
 
                 return
 
-            # -----------------------------------------------
-            # XGBOOST
-            # -----------------------------------------------
 
-            prediction = (
-                predict_market_price(
-                    market_data
-                )
+            # =================================================
+            # XGBOOST
+            # =================================================
+
+            prediction = predict_market_price(
+                market_data
             )
 
+
+            # =================================================
+            # FINAL RESPONSE
+            # =================================================
+
             response = {
+
                 **market_data,
+
                 "prediction":
                     prediction
+
             }
+
 
             send_json(
                 self,
                 response
             )
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # UNKNOWN ROUTE
-        # ----------------------------------------------------
+        # ====================================================
 
         else:
 
@@ -1084,9 +1185,6 @@ class Handler(
 
         global last_update_time
 
-        # ----------------------------------------------------
-        # ESP32 SENSOR UPDATE
-        # ----------------------------------------------------
 
         if self.path != "/update":
 
@@ -1096,36 +1194,51 @@ class Handler(
 
             return
 
+
         try:
 
             content_length = int(
+
                 self.headers.get(
                     "Content-Length",
                     "0"
                 )
+
             )
+
 
             if content_length <= 0:
 
                 send_json(
+
                     self,
+
                     {
-                        "status": "error",
+
+                        "status":
+                            "error",
+
                         "message":
                             "Empty request body."
+
                     },
+
                     400
+
                 )
 
                 return
+
 
             body = self.rfile.read(
                 content_length
             )
 
+
             data = json.loads(
                 body.decode("utf-8")
             )
+
 
             print()
             print(
@@ -1133,54 +1246,65 @@ class Handler(
             )
             print(data)
 
-            # ------------------------------------------------
-            # ONLY UPDATE VALUES THAT ACTUALLY EXIST
-            # ------------------------------------------------
 
             allowed_fields = [
+
                 "moisture",
                 "temperature",
                 "ph",
                 "n",
                 "p",
                 "k"
+
             ]
+
 
             for field in allowed_fields:
 
-                if field in data:
+                if field not in data:
+                    continue
 
-                    value = data[field]
 
-                    if value is None:
-                        continue
+                value = data[field]
 
-                    try:
 
-                        value = float(
-                            value
-                        )
+                if value is None:
+                    continue
 
-                    except:
 
-                        continue
+                try:
 
-                    latest_data[
-                        field
-                    ] = value
+                    value = float(
+                        value
+                    )
 
-            last_update_time = (
-                time.time()
-            )
+                except:
+
+                    continue
+
+
+                latest_data[field] = value
+
+
+            last_update_time = time.time()
+
 
             send_json(
+
                 self,
+
                 {
-                    "status": "ok",
+
+                    "status":
+                        "ok",
+
                     "message":
                         "Sensor data received."
+
                 }
+
             )
+
 
         except Exception as error:
 
@@ -1189,45 +1313,51 @@ class Handler(
                 error
             )
 
+
             send_json(
+
                 self,
+
                 {
-                    "status": "error",
+
+                    "status":
+                        "error",
+
                     "message":
                         str(error)
+
                 },
+
                 400
+
             )
 
 
 # ============================================================
-# START ONE SERVER
+# START SERVER
 # ============================================================
 
 server = HTTPServer(
+
     ("0.0.0.0", 8000),
+
     Handler
+
 )
+
 
 print()
 print("==============================================")
 print(" SMART CROP PROJECT")
 print("==============================================")
 print()
-print(
-    "Open only:"
-)
-print(
-    "http://localhost:8000"
-)
+print("Open:")
+print("http://localhost:8000")
 print()
-print(
-    "One server is running on port 8000."
-)
+print("Server running on port 8000.")
 print()
-print(
-    "Waiting for ESP32 sensor data..."
-)
+print("Waiting for ESP32 and market requests...")
 print()
+
 
 server.serve_forever()

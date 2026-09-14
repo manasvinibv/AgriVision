@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<title>Smart Crop Recommendation</title>
+    <meta charset="UTF-8">
 
-<link rel="stylesheet" href="/style.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Smart Crop Recommendation</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -15,39 +20,61 @@
 <body>
 
 
+<!-- ===================================================== -->
+<!-- SIDEBAR -->
+<!-- ===================================================== -->
+
 <nav class="sidebar">
 
-<a class="nav-btn"
-   onclick="showPage('dashboard',this)">
- Dashboard
-</a>
+    <div class="logo">
+        🌱
+        <span>AgriVision</span>
+    </div>
 
-<a class="nav-btn"
-   onclick="showPage('graphs',this)">
- Graphs
-</a>
 
-<a class="nav-btn"
-   onclick="showPage('history',this)">
- History
-</a>
+    <a class="nav-btn"
+       onclick="showPage('dashboard',this)">
+        <span>⌂</span>
+        Dashboard
+    </a>
 
-<a class="nav-btn"
-   onclick="showPage('market',this)">
- Market Price
-</a>
 
-<a class="nav-btn"
-   onclick="showPage('alerts',this)">
- Alerts
-</a>
+    <a class="nav-btn"
+       onclick="showPage('graphs',this)">
+        <span>◉</span>
+        Graphs
+    </a>
 
-<a class="nav-btn"
-   onclick="showPage('health',this)">
- Health Report
-</a>
+
+    <a class="nav-btn"
+       onclick="showPage('history',this)">
+        <span>▣</span>
+        History
+    </a>
+
+
+    <a class="nav-btn"
+       onclick="showPage('market',this)">
+        <span>₹</span>
+        Market Price
+    </a>
+
+
+    <a class="nav-btn"
+       onclick="showPage('alerts',this)">
+        <span>⚠</span>
+        Alerts
+    </a>
+
+
+    <a class="nav-btn"
+       onclick="showPage('health',this)">
+        <span>♥</span>
+        Health Report
+    </a>
 
 </nav>
+
 
 
 <!-- ===================================================== -->
@@ -56,317 +83,749 @@
 
 <div id="dashboard" class="page">
 
-<div class="container">
-
-<h2>Crop Prediction</h2>
+    <div class="container dashboard-container">
 
 
-<div class="grid">
+        <div class="page-heading">
 
-<div class="box">
-<p>Moisture</p>
-<div id="moisture">--</div>
+            <div>
+
+                <span class="eyebrow">
+                    SMART AGRICULTURE
+                </span>
+
+                <h2>
+                    Crop Prediction
+                </h2>
+
+                <p>
+                    Real-time soil monitoring and intelligent crop recommendation
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- SENSOR CARDS -->
+        <!-- ================================================= -->
+
+        <div class="grid">
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    💧
+                </div>
+
+                <p>
+                    Moisture
+                </p>
+
+                <div id="moisture"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    %
+                </span>
+
+            </div>
+
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    🌡
+                </div>
+
+                <p>
+                    Temperature
+                </p>
+
+                <div id="temp"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    °C
+                </span>
+
+            </div>
+
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    ⚗
+                </div>
+
+                <p>
+                    Soil pH
+                </p>
+
+                <div id="ph"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    pH
+                </span>
+
+            </div>
+
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    N
+                </div>
+
+                <p>
+                    Nitrogen
+                </p>
+
+                <div id="n"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    mg/kg
+                </span>
+
+            </div>
+
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    P
+                </div>
+
+                <p>
+                    Phosphorus
+                </p>
+
+                <div id="p"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    mg/kg
+                </span>
+
+            </div>
+
+
+
+            <div class="box sensor-card">
+
+                <div class="sensor-icon">
+                    K
+                </div>
+
+                <p>
+                    Potassium
+                </p>
+
+                <div id="k"
+                     class="sensor-value">
+                    --
+                </div>
+
+                <span class="sensor-unit">
+                    mg/kg
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- RECOMMENDATION BUTTON -->
+        <!-- ================================================= -->
+
+        <button
+            class="recommend-btn"
+            onclick="getRecommendation()">
+
+            <span>
+                ✨
+            </span>
+
+            Get Recommendation
+
+        </button>
+
+
+
+        <!-- ================================================= -->
+        <!-- RECOMMENDATION RESULT -->
+        <!-- ================================================= -->
+
+        <div class="recommendation-card">
+
+
+            <!-- HEADER -->
+
+            <div class="recommendation-header">
+
+                <div class="recommendation-title-icon">
+                    🌱
+                </div>
+
+                <div>
+
+                    <h3>
+                        Crop Recommendation
+                    </h3>
+
+                    <p>
+                        AI-powered prediction based on current soil conditions
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BEST CROP -->
+
+            <div class="best-crop-section">
+
+
+                <div class="best-crop-badge">
+
+                    <span>
+                        🏆
+                    </span>
+
+                    BEST MATCH
+
+                </div>
+
+
+                <div id="bestCrop"
+                     class="best-crop-name">
+
+                    <span class="placeholder-text">
+                        Click "Get Recommendation" to analyze your soil
+                    </span>
+
+                </div>
+
+
+                <div id="confidenceArea"
+                     class="confidence-area"
+                     style="display:none;">
+
+                    <div class="confidence-header">
+
+                        <span>
+                            Model Confidence
+                        </span>
+
+                        <strong id="confidenceValue">
+                            0%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="confidence-bar">
+
+                        <div id="confidenceFill"
+                             class="confidence-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- OTHER CROPS -->
+
+            <div class="other-crops-section">
+
+                <div class="section-label">
+
+                    <span>
+                        🌾
+                    </span>
+
+                    Other Suitable Crops
+
+                </div>
+
+
+                <div id="topCrops"
+                     class="other-crops-list">
+
+                    <div class="recommendation-placeholder">
+                        Alternative recommendations will appear here
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
 </div>
 
-<div class="box">
-<p>Temperature</p>
-<div id="temp">--</div>
-</div>
-
-<div class="box">
-<p>pH</p>
-<div id="ph">--</div>
-</div>
-
-<div class="box">
-<p>Nitrogen</p>
-<div id="n">--</div>
-</div>
-
-<div class="box">
-<p>Phosphorus</p>
-<div id="p">--</div>
-</div>
-
-<div class="box">
-<p>Potassium</p>
-<div id="k">--</div>
-</div>
-
-</div>
-
-
-<button onclick="getRecommendation()">
-Get Recommendation
-</button>
-
-
-
-<p id="bestCrop"></p>
-
-</div>
-
-</div>
 
 
 <!-- ===================================================== -->
 <!-- GRAPHS -->
 <!-- ===================================================== -->
 
-<div id="graphs" class="page section">
+<div id="graphs"
+     class="page section">
 
-<canvas id="chart"></canvas>
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <span class="eyebrow">
+                ANALYTICS
+            </span>
+
+            <h3>
+                Soil Moisture Trends
+            </h3>
+
+            <p>
+                Real-time moisture readings from the soil sensor
+            </p>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <canvas id="chart"></canvas>
+
+        </div>
+
+    </div>
 
 </div>
+
 
 
 <!-- ===================================================== -->
 <!-- HISTORY -->
 <!-- ===================================================== -->
 
-<div id="history" class="page section">
+<div id="history"
+     class="page section">
 
-<table>
+    <div class="section-container">
 
-<tr>
+        <div class="section-heading">
 
-<th>Time</th>
+            <span class="eyebrow">
+                RECORDS
+            </span>
 
-<th>Moisture</th>
+            <h3>
+                Sensor History
+            </h3>
 
-<th>pH</th>
+        </div>
 
-</tr>
 
-<tbody id="historyTable">
+        <div class="table-card">
 
-</tbody>
+            <table>
 
-</table>
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Moisture
+                        </th>
+
+                        <th>
+                            pH
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="historyTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
+
 
 
 <!-- ===================================================== -->
-<!-- MARKET -->
+<!-- MARKET PRICE -->
 <!-- ===================================================== -->
 
-<div id="market" class="page section">
+<div id="market"
+     class="page section">
 
-<h3>Market Price Prediction</h3>
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <span class="eyebrow">
+                MARKET INTELLIGENCE
+            </span>
+
+            <h3>
+                Market Price Prediction
+            </h3>
+
+            <p>
+                Government market data with XGBoost price prediction
+            </p>
+
+        </div>
 
 
-<div class="market-inputs">
+
+        <div class="market-inputs">
 
 
-<div class="input-group">
+            <div class="input-group">
 
-<label for="marketStateInput">
-State
-</label>
+                <label for="marketStateInput">
+                    State
+                </label>
 
-<input
-id="marketStateInput"
-type="text"
-placeholder="Enter state"
->
+                <input
+                    id="marketStateInput"
+                    type="text"
+                    placeholder="Enter state">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+                <label for="marketDistrictInput">
+                    District
+                </label>
+
+                <input
+                    id="marketDistrictInput"
+                    type="text"
+                    placeholder="Enter district">
+
+            </div>
+
+
+
+            <div class="input-group">
+
+                <label for="marketCommodityInput">
+                    Commodity
+                </label>
+
+                <input
+                    id="marketCommodityInput"
+                    type="text"
+                    placeholder="Enter commodity">
+
+            </div>
+
+
+        </div>
+
+
+
+        <button
+            class="market-btn"
+            onclick="loadMarketData()">
+
+            Get Market Price
+
+        </button>
+
+
+
+        <p id="marketStatus"
+           class="market-status">
+
+            Enter State, District and Commodity.
+
+        </p>
+
+
+
+        <!-- MARKET RESULT -->
+
+        <div
+            id="marketResult"
+            class="market-grid"
+            style="display:none;">
+
+
+            <div class="market-card">
+
+                <p>
+                    Commodity
+                </p>
+
+                <div id="marketCommodity">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    State
+                </p>
+
+                <div id="marketState">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    District
+                </p>
+
+                <div id="marketDistrict">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    Market
+                </p>
+
+                <div id="marketName">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    Arrival Date
+                </p>
+
+                <div id="marketDate">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    Variety
+                </p>
+
+                <div id="marketVariety">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    Minimum Price
+                </p>
+
+                <div id="minPrice">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card">
+
+                <p>
+                    Maximum Price
+                </p>
+
+                <div id="maxPrice">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card highlight">
+
+                <p>
+                    Actual Modal Price
+                </p>
+
+                <div id="modalPrice">
+                    --
+                </div>
+
+            </div>
+
+
+
+            <div class="market-card prediction">
+
+                <p>
+                    XGBoost Predicted Modal Price
+                </p>
+
+                <div id="predictedPrice">
+                    --
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
 
 </div>
 
-
-<div class="input-group">
-
-<label for="marketDistrictInput">
-District
-</label>
-
-<input
-id="marketDistrictInput"
-type="text"
-placeholder="Enter district"
->
-
-</div>
-
-
-<div class="input-group">
-
-<label for="marketCommodityInput">
-Commodity
-</label>
-
-<input
-id="marketCommodityInput"
-type="text"
-placeholder="Enter commodity"
->
-
-</div>
-
-
-</div>
-
-
-<button onclick="loadMarketData()">
-Get Market Price
-</button>
-
-
-<p id="marketStatus">
-Enter State, District and Commodity.
-</p>
-
-
-<div
-id="marketResult"
-class="market-grid"
-style="display:none;"
->
-
-
-<div class="market-card">
-
-<p>Commodity</p>
-
-<div id="marketCommodity">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>State</p>
-
-<div id="marketState">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>District</p>
-
-<div id="marketDistrict">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>Market</p>
-
-<div id="marketName">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>Arrival Date</p>
-
-<div id="marketDate">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>Variety</p>
-
-<div id="marketVariety">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>Minimum Price</p>
-
-<div id="minPrice">
---
-</div>
-
-</div>
-
-
-<div class="market-card">
-
-<p>Maximum Price</p>
-
-<div id="maxPrice">
---
-</div>
-
-</div>
-
-
-<div class="market-card highlight">
-
-<p>Actual Modal Price</p>
-
-<div id="modalPrice">
---
-</div>
-
-</div>
-
-
-<div class="market-card prediction">
-
-<p>XGBoost Predicted Modal Price</p>
-
-<div id="predictedPrice">
---
-</div>
-
-</div>
-
-
-</div>
-
-</div>
 
 
 <!-- ===================================================== -->
 <!-- ALERTS -->
 <!-- ===================================================== -->
 
-<div id="alerts" class="page section">
+<div id="alerts"
+     class="page section">
 
-<h3>Alerts</h3>
+    <div class="section-container">
 
-<p id="alertText">
-Waiting for sensor data...
-</p>
+        <div class="info-card alert-card">
+
+            <div class="info-icon">
+                ⚠️
+            </div>
+
+            <div>
+
+                <span class="eyebrow">
+                    MONITORING
+                </span>
+
+                <h3>
+                    Alerts
+                </h3>
+
+                <p id="alertText">
+                    Waiting for sensor data...
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
 
+
 <!-- ===================================================== -->
-<!-- HEALTH -->
+<!-- HEALTH REPORT -->
 <!-- ===================================================== -->
 
-<div id="health" class="page section">
+<div id="health"
+     class="page section">
 
-<h3>Health Report</h3>
+    <div class="section-container">
 
-<p id="healthText">
-Waiting for sensor data...
-</p>
+        <div class="info-card health-card">
+
+            <div class="info-icon">
+                🌿
+            </div>
+
+            <div>
+
+                <span class="eyebrow">
+                    SOIL ANALYSIS
+                </span>
+
+                <h3>
+                    Health Report
+                </h3>
+
+                <p id="healthText">
+                    Waiting for sensor data...
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
 
 
 <script>
@@ -379,95 +838,113 @@ Waiting for sensor data...
 function showPage(page, button) {
 
 
-document
-.querySelectorAll('.page')
-.forEach(p => {
+    document
+        .querySelectorAll(".page")
+        .forEach(p => {
 
-p.classList.remove('active');
+            p.classList.remove("active");
 
-});
-
-
-setTimeout(() => {
-
-document
-.getElementById(page)
-.classList.add('active');
-
-}, 100);
+        });
 
 
-// ---------------------------------------------------------
-// ACTIVE BUTTON
-// ---------------------------------------------------------
+    setTimeout(() => {
 
-document
-.querySelectorAll('.nav-btn')
-.forEach(btn => {
+        document
+            .getElementById(page)
+            .classList.add("active");
 
-btn.classList.remove('active');
-
-});
+    }, 50);
 
 
-if(button) {
 
-button.classList.add('active');
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(btn => {
+
+            btn.classList.remove("active");
+
+        });
+
+
+    if(button) {
+
+        button.classList.add("active");
+
+    }
+
+
+
+    // -----------------------------------------------------
+    // BACKGROUND
+    // -----------------------------------------------------
+
+    let bg = "bp.jpg";
+
+
+    if(page === "graphs") {
+
+        bg = "graphs.jpg";
+
+    }
+
+    else if(page === "history") {
+
+        bg = "history.jpg";
+
+    }
+
+    else if(page === "market") {
+
+        bg = "report.jpg";
+
+    }
+
+    else if(page === "alerts") {
+
+        bg = "alert.jpg";
+
+    }
+
+    else if(page === "health") {
+
+        bg = "health.jpg";
+
+    }
+
+
+    document.body.style.background =
+        `linear-gradient(
+            rgba(0,0,0,0.60),
+            rgba(0,0,0,0.60)
+        ),
+        url('/images/${bg}')`;
+
+
+    document.body.style.backgroundSize =
+        "cover";
+
+
+    document.body.style.backgroundPosition =
+        "center";
+
+
+    document.body.style.backgroundAttachment =
+        "fixed";
+
+
+
+    // -----------------------------------------------------
+    // HISTORY
+    // -----------------------------------------------------
+
+    if(page === "history") {
+
+        loadHistory();
+
+    }
 
 }
 
-
-// ---------------------------------------------------------
-// BACKGROUND
-// ---------------------------------------------------------
-
-let bg = "bp.jpg";
-
-
-if(page === "history") {
-
-bg = "history.jpg";
-
-}
-
-else if(page === "alerts") {
-
-bg = "alert.jpg";
-
-}
-
-else if(page === "health") {
-
-bg = "health.jpg";
-
-}
-
-
-document.body.style.background =
-`linear-gradient(
-rgba(0,0,0,0.6),
-rgba(0,0,0,0.6)
-), url('/images/${bg}')`;
-
-
-document.body.style.backgroundSize =
-"cover";
-
-document.body.style.backgroundPosition =
-"center";
-
-
-// ---------------------------------------------------------
-// HISTORY
-// ---------------------------------------------------------
-
-if(page === "history") {
-
-loadHistory();
-
-}
-
-}
 
 
 // =========================================================
@@ -475,9 +952,10 @@ loadHistory();
 // =========================================================
 
 window.onload = function() {
-    showPage("dashboard", null);
-};
 
+    showPage("dashboard", null);
+
+};
 
 
 
@@ -491,35 +969,41 @@ let dataPoints = [];
 
 
 const chart =
-new Chart(
-document.getElementById("chart"),
-{
+    new Chart(
+        document.getElementById("chart"),
+        {
 
-type: "line",
+            type: "line",
 
-data: {
+            data: {
 
-labels: labels,
+                labels: labels,
 
-datasets: [{
+                datasets: [{
 
-label: "Moisture",
+                    label: "Moisture",
 
-data: dataPoints
+                    data: dataPoints,
 
-}]
+                    tension: 0.4,
 
-},
+                    fill: true
 
-options: {
+                }]
 
-responsive: true,
+            },
 
-maintainAspectRatio: false
+            options: {
 
-}
+                responsive: true,
 
-});
+                maintainAspectRatio: false
+
+            }
+
+        }
+    );
+
 
 
 // =========================================================
@@ -529,186 +1013,224 @@ maintainAspectRatio: false
 function fetchData() {
 
 
-fetch("/data")
+    fetch("/data")
 
-.then(response =>
-response.json()
-)
+        .then(response => {
 
-.then(data => {
+            if(!response.ok) {
 
+                throw new Error(
+                    "Server returned " +
+                    response.status
+                );
 
-if(data.status !== "ok") {
+            }
 
+            return response.json();
 
-document
-.getElementById("moisture")
-.innerText = "--";
-
-document
-.getElementById("temp")
-.innerText = "--";
-
-document
-.getElementById("ph")
-.innerText = "--";
-
-document
-.getElementById("n")
-.innerText = "--";
-
-document
-.getElementById("p")
-.innerText = "--";
-
-document
-.getElementById("k")
-.innerText = "--";
+        })
 
 
-document
-.getElementById("alertText")
-.innerText =
-data.message ||
-"Waiting for sensor data.";
+        .then(data => {
 
 
-document
-.getElementById("healthText")
-.innerText =
-"Waiting for valid sensor data.";
+            console.log(
+                "Sensor data:",
+                data
+            );
 
 
-return;
+
+            // -------------------------------------------------
+            // NO SENSOR DATA
+            // -------------------------------------------------
+
+            if(data.status !== "ok") {
+
+
+                document
+                    .getElementById("moisture")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("temp")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("ph")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("n")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("p")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("k")
+                    .innerText = "--";
+
+
+                document
+                    .getElementById("alertText")
+                    .innerText =
+                    data.message ||
+                    "Waiting for sensor data.";
+
+
+                document
+                    .getElementById("healthText")
+                    .innerText =
+                    "Waiting for valid sensor data.";
+
+
+                return;
+
+            }
+
+
+
+            // -------------------------------------------------
+            // SENSOR VALUES
+            // -------------------------------------------------
+
+            document
+                .getElementById("moisture")
+                .innerText =
+                data.moisture;
+
+
+            document
+                .getElementById("temp")
+                .innerText =
+                data.temperature;
+
+
+            document
+                .getElementById("ph")
+                .innerText =
+                data.ph;
+
+
+            document
+                .getElementById("n")
+                .innerText =
+                data.n;
+
+
+            document
+                .getElementById("p")
+                .innerText =
+                data.p;
+
+
+            document
+                .getElementById("k")
+                .innerText =
+                data.k;
+
+
+
+            // -------------------------------------------------
+            // GRAPH
+            // -------------------------------------------------
+
+            let t =
+                new Date()
+                    .toLocaleTimeString();
+
+
+            labels.push(t);
+
+            dataPoints.push(
+                data.moisture
+            );
+
+
+            if(labels.length > 10) {
+
+                labels.shift();
+
+                dataPoints.shift();
+
+            }
+
+
+            chart.update();
+
+
+
+            // -------------------------------------------------
+            // ALERT
+            // -------------------------------------------------
+
+            if(data.moisture < 30) {
+
+                document
+                    .getElementById("alertText")
+                    .innerText =
+                    "⚠ Low moisture detected. Soil may require irrigation.";
+
+            }
+
+            else {
+
+                document
+                    .getElementById("alertText")
+                    .innerText =
+                    "✓ Moisture level is within the acceptable range.";
+
+            }
+
+
+
+            // -------------------------------------------------
+            // HEALTH
+            // -------------------------------------------------
+
+            if(
+                data.ph >= 6 &&
+                data.ph <= 7
+            ) {
+
+                document
+                    .getElementById("healthText")
+                    .innerText =
+                    "✓ Soil pH is within the healthy range.";
+
+            }
+
+            else {
+
+                document
+                    .getElementById("healthText")
+                    .innerText =
+                    "⚠ Soil pH requires attention.";
+
+            }
+
+
+        })
+
+
+        .catch(error => {
+
+            console.error(
+                "Sensor data error:",
+                error
+            );
+
+        });
 
 }
 
-
-// ---------------------------------------------------------
-// DISPLAY REAL SENSOR VALUES
-// ---------------------------------------------------------
-
-document
-.getElementById("moisture")
-.innerText =
-data.moisture;
-
-
-document
-.getElementById("temp")
-.innerText =
-data.temperature !== null &&
-data.temperature !== undefined
-?
-data.temperature
-:
-"--";
-
-
-document
-.getElementById("ph")
-.innerText =
-data.ph;
-
-
-document
-.getElementById("n")
-.innerText =
-data.n;
-
-
-document
-.getElementById("p")
-.innerText =
-data.p;
-
-
-document
-.getElementById("k")
-.innerText =
-data.k;
-
-
-// ---------------------------------------------------------
-// GRAPH
-// ---------------------------------------------------------
-
-let t =
-new Date()
-.toLocaleTimeString();
-
-
-labels.push(t);
-
-dataPoints.push(
-data.moisture
-);
-
-
-if(labels.length > 10) {
-
-labels.shift();
-
-dataPoints.shift();
-
-}
-
-
-chart.update();
-
-
-// ---------------------------------------------------------
-// ALERT
-// ---------------------------------------------------------
-
-if(data.moisture < 30) {
-
-document
-.getElementById("alertText")
-.innerText =
-"Low moisture";
-
-}
-
-else {
-
-document
-.getElementById("alertText")
-.innerText =
-"Normal";
-
-}
-
-
-// ---------------------------------------------------------
-// HEALTH
-// ---------------------------------------------------------
-
-if(
-data.ph >= 6 &&
-data.ph <= 7
-) {
-
-document
-.getElementById("healthText")
-.innerText =
-"Soil healthy";
-
-}
-
-else {
-
-document
-.getElementById("healthText")
-.innerText =
-"Check soil condition";
-
-}
-
-
-});
-
-}
 
 
 // =========================================================
@@ -718,57 +1240,71 @@ document
 function loadHistory() {
 
 
-fetch("/data")
+    fetch("/data")
 
-.then(response =>
-response.json()
-)
+        .then(response =>
+            response.json()
+        )
 
-.then(data => {
+        .then(data => {
 
 
-if(data.status !== "ok") {
+            if(data.status !== "ok") {
 
-document
-.getElementById("historyTable")
-.innerHTML =
-`<tr>
-<td colspan="3">
-${data.message || "No sensor data available."}
-</td>
-</tr>`;
 
-return;
+                document
+                    .getElementById("historyTable")
+                    .innerHTML =
+
+                    `<tr>
+                        <td colspan="3">
+                            ${data.message ||
+                            "No sensor data available."}
+                        </td>
+                    </tr>`;
+
+                return;
+
+            }
+
+
+
+            let time =
+                new Date()
+                    .toLocaleTimeString();
+
+
+            let row = `
+
+                <tr>
+
+                    <td>
+                        ${time}
+                    </td>
+
+                    <td>
+                        ${data.moisture}
+                    </td>
+
+                    <td>
+                        ${data.ph}
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            document
+                .getElementById("historyTable")
+                .innerHTML =
+                row;
+
+
+        });
 
 }
 
-
-let time =
-new Date()
-.toLocaleTimeString();
-
-
-let row = `
-<tr>
-
-<td>${time}</td>
-
-<td>${data.moisture}</td>
-
-<td>${data.ph}</td>
-
-</tr>
-`;
-
-
-document
-.getElementById("historyTable")
-.innerHTML =
-row;
-
-});
-
-}
 
 
 // =========================================================
@@ -778,71 +1314,309 @@ row;
 function getRecommendation() {
 
 
-fetch("/data")
-
-.then(response =>
-response.json()
-)
-
-.then(data => {
+    const bestCrop =
+        document.getElementById(
+            "bestCrop"
+        );
 
 
-if(data.status !== "ok") {
+    const topCrops =
+        document.getElementById(
+            "topCrops"
+        );
 
-alert(
-data.message ||
-"No valid sensor data available."
-);
 
-return;
+    const confidenceArea =
+        document.getElementById(
+            "confidenceArea"
+        );
+
+
+    const confidenceValue =
+        document.getElementById(
+            "confidenceValue"
+        );
+
+
+    const confidenceFill =
+        document.getElementById(
+            "confidenceFill"
+        );
+
+
+
+    // -----------------------------------------------------
+    // LOADING STATE
+    // -----------------------------------------------------
+
+    bestCrop.innerHTML =
+
+        `<span class="loading-text">
+            🔄 Analyzing soil conditions...
+        </span>`;
+
+
+    topCrops.innerHTML =
+
+        `<div class="recommendation-placeholder">
+            Please wait while the Random Forest model generates recommendations.
+        </div>`;
+
+
+    confidenceArea.style.display =
+        "none";
+
+
+
+    // -----------------------------------------------------
+    // GET DATA
+    // -----------------------------------------------------
+
+    fetch("/data")
+
+        .then(response => {
+
+            if(!response.ok) {
+
+                throw new Error(
+                    "Server returned " +
+                    response.status
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+
+        .then(data => {
+
+
+            console.log(
+                "Recommendation data:",
+                data
+            );
+
+
+
+            // -------------------------------------------------
+            // SENSOR DATA CHECK
+            // -------------------------------------------------
+
+            if(data.status !== "ok") {
+
+
+                bestCrop.innerHTML =
+
+                    `<span class="error-text">
+                        ⚠ ${data.message ||
+                        "No valid sensor data available."}
+                    </span>`;
+
+
+                topCrops.innerHTML = "";
+
+
+                return;
+
+            }
+
+
+
+            // -------------------------------------------------
+            // MODEL CHECK
+            // -------------------------------------------------
+
+            if(
+                !data.crops ||
+                data.crops.length === 0
+            ) {
+
+
+                bestCrop.innerHTML =
+
+                    `<span class="error-text">
+                        Crop recommendation model is not available.
+                    </span>`;
+
+
+                topCrops.innerHTML = "";
+
+
+                return;
+
+            }
+
+
+
+            // -------------------------------------------------
+            // GET TOP CROPS
+            // -------------------------------------------------
+
+            const crops =
+                data.crops;
+
+
+
+            const best =
+                crops[0];
+
+
+
+            // -------------------------------------------------
+            // BEST CROP
+            // -------------------------------------------------
+
+            bestCrop.innerHTML =
+
+                `<span class="crop-name">
+                    ${best.crop}
+                </span>`;
+
+
+
+            // -------------------------------------------------
+            // CONFIDENCE
+            // -------------------------------------------------
+
+            const confidence =
+                Number(
+                    best.confidence
+                );
+
+
+            confidenceArea.style.display =
+                "block";
+
+
+            confidenceValue.innerText =
+                confidence + "%";
+
+
+            setTimeout(() => {
+
+                confidenceFill.style.width =
+                    Math.min(
+                        Math.max(
+                            confidence,
+                            0
+                        ),
+                        100
+                    ) + "%";
+
+            }, 100);
+
+
+
+            // -------------------------------------------------
+            // OTHER CROPS
+            // -------------------------------------------------
+
+            let alternativeCrops =
+                crops.slice(1);
+
+
+
+            if(
+                alternativeCrops.length === 0
+            ) {
+
+
+                topCrops.innerHTML =
+
+                    `<div class="recommendation-placeholder">
+                        No alternative crops available.
+                    </div>`;
+
+                return;
+
+            }
+
+
+
+            topCrops.innerHTML =
+
+                alternativeCrops
+                    .map((crop, index) => {
+
+                        return `
+
+                            <div class="alternative-crop">
+
+                                <div class="alternative-icon">
+
+                                    ${
+                                        index === 0
+                                        ? "🌾"
+                                        : "🍃"
+                                    }
+
+                                </div>
+
+
+                                <div class="alternative-info">
+
+                                    <div class="alternative-name">
+
+                                        ${crop.crop}
+
+                                    </div>
+
+
+                                    <div class="alternative-confidence">
+
+                                        Model confidence
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="alternative-percent">
+
+                                    ${crop.confidence}%
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    })
+                    .join("");
+
+
+        })
+
+
+        .catch(error => {
+
+
+            console.error(
+                "Recommendation error:",
+                error
+            );
+
+
+            bestCrop.innerHTML =
+
+                `<span class="error-text">
+                    ⚠ Could not get crop recommendation.
+                </span>`;
+
+
+            topCrops.innerHTML =
+
+                `<div class="recommendation-placeholder">
+                    Please check the server connection.
+                </div>`;
+
+
+        });
 
 }
 
-
-if(
-!data.crops ||
-data.crops.length === 0
-) {
-
-document
-.getElementById("topCrops")
-.innerText =
-"Crop recommendation model is not connected yet.";
-
-document
-.getElementById("bestCrop")
-.innerText =
-"";
-
-return;
-
-}
-
-
-let crops =
-data.crops.map(
-c => c[0]
-);
-
-
-document
-.getElementById("topCrops")
-.innerText =
-"Top Crops: "
-+
-crops.join(", ");
-
-
-document
-.getElementById("bestCrop")
-.innerText =
-"Best Crop: "
-+
-crops[0];
-
-});
-
-}
 
 
 // =========================================================
@@ -852,248 +1626,322 @@ crops[0];
 function loadMarketData() {
 
 
-let state =
-document
-.getElementById(
-"marketStateInput"
-)
-.value
-.trim();
+    let state =
+        document
+            .getElementById(
+                "marketStateInput"
+            )
+            .value
+            .trim();
 
 
-let district =
-document
-.getElementById(
-"marketDistrictInput"
-)
-.value
-.trim();
+    let district =
+        document
+            .getElementById(
+                "marketDistrictInput"
+            )
+            .value
+            .trim();
 
 
-let commodity =
-document
-.getElementById(
-"marketCommodityInput"
-)
-.value
-.trim();
+    let commodity =
+        document
+            .getElementById(
+                "marketCommodityInput"
+            )
+            .value
+            .trim();
 
 
-// ---------------------------------------------------------
-// VALIDATE INPUT
-// ---------------------------------------------------------
 
-if(
-!state ||
-!district ||
-!commodity
-) {
+    // -----------------------------------------------------
+    // VALIDATE
+    // -----------------------------------------------------
 
-document
-.getElementById("marketStatus")
-.innerText =
-"Please enter State, District and Commodity.";
+    if(
+        !state ||
+        !district ||
+        !commodity
+    ) {
 
-document
-.getElementById("marketResult")
-.style.display =
-"none";
 
-return;
+        document
+            .getElementById(
+                "marketStatus"
+            )
+            .innerText =
+            "Please enter State, District and Commodity.";
+
+
+        document
+            .getElementById(
+                "marketResult"
+            )
+            .style.display =
+            "none";
+
+
+        return;
+
+    }
+
+
+
+    // -----------------------------------------------------
+    // STATUS
+    // -----------------------------------------------------
+
+    document
+        .getElementById(
+            "marketStatus"
+        )
+        .innerText =
+        "Getting actual market data...";
+
+
+    document
+        .getElementById(
+            "marketResult"
+        )
+        .style.display =
+        "none";
+
+
+
+    // -----------------------------------------------------
+    // URL PARAMETERS
+    // -----------------------------------------------------
+
+    const params =
+        new URLSearchParams({
+
+            state: state,
+
+            district: district,
+
+            commodity: commodity
+
+        });
+
+
+
+    fetch(
+        "/market-predict?" +
+        params.toString()
+    )
+
+        .then(response => {
+
+            if(!response.ok) {
+
+                throw new Error(
+                    "Server returned " +
+                    response.status
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+
+        .then(data => {
+
+
+            console.log(
+                "Market data:",
+                data
+            );
+
+
+
+            if(data.status !== "ok") {
+
+
+                document
+                    .getElementById(
+                        "marketStatus"
+                    )
+                    .innerText =
+                    data.message ||
+                    "No market data available.";
+
+
+                return;
+
+            }
+
+
+
+            // -------------------------------------------------
+            // ACTUAL MARKET DATA
+            // -------------------------------------------------
+
+            document
+                .getElementById(
+                    "marketCommodity"
+                )
+                .innerText =
+                data.commodity ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "marketState"
+                )
+                .innerText =
+                data.state ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "marketDistrict"
+                )
+                .innerText =
+                data.district ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "marketName"
+                )
+                .innerText =
+                data.market ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "marketDate"
+                )
+                .innerText =
+                data.date ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "marketVariety"
+                )
+                .innerText =
+                data.variety ||
+                "--";
+
+
+            document
+                .getElementById(
+                    "minPrice"
+                )
+                .innerText =
+                "₹ " +
+                data.min_price;
+
+
+            document
+                .getElementById(
+                    "maxPrice"
+                )
+                .innerText =
+                "₹ " +
+                data.max_price;
+
+
+            document
+                .getElementById(
+                    "modalPrice"
+                )
+                .innerText =
+                "₹ " +
+                data.modal_price;
+
+
+
+            // -------------------------------------------------
+            // XGBOOST
+            // -------------------------------------------------
+
+            if(
+                data.prediction &&
+                data.prediction.status === "ok"
+            ) {
+
+
+                document
+                    .getElementById(
+                        "predictedPrice"
+                    )
+                    .innerText =
+                    "₹ " +
+                    data.prediction
+                        .predicted_modal_price;
+
+
+                document
+                    .getElementById(
+                        "marketStatus"
+                    )
+                    .innerText =
+                    "✓ Actual market data and XGBoost prediction loaded.";
+
+            }
+
+            else {
+
+
+                document
+                    .getElementById(
+                        "predictedPrice"
+                    )
+                    .innerText =
+                    "--";
+
+
+                document
+                    .getElementById(
+                        "marketStatus"
+                    )
+                    .innerText =
+                    "Market data loaded, but prediction is unavailable.";
+
+            }
+
+
+
+            document
+                .getElementById(
+                    "marketResult"
+                )
+                .style.display =
+                "grid";
+
+
+        })
+
+
+        .catch(error => {
+
+
+            console.error(
+                "Market error:",
+                error
+            );
+
+
+            document
+                .getElementById(
+                    "marketStatus"
+                )
+                .innerText =
+                "Could not connect to the local server.";
+
+        });
 
 }
 
-
-// ---------------------------------------------------------
-// STATUS
-// ---------------------------------------------------------
-
-document
-.getElementById("marketStatus")
-.innerText =
-"Getting actual market data...";
-
-
-document
-.getElementById("marketResult")
-.style.display =
-"none";
-
-
-// ---------------------------------------------------------
-// URL
-// ---------------------------------------------------------
-
-const params =
-new URLSearchParams({
-
-state: state,
-
-district: district,
-
-commodity: commodity
-
-});
-
-
-fetch(
-"/market-predict?" +
-params.toString()
-)
-
-.then(response =>
-response.json()
-)
-
-.then(data => {
-
-
-if(data.status !== "ok") {
-
-
-document
-.getElementById("marketStatus")
-.innerText =
-data.message ||
-"No market data available.";
-
-
-return;
-
-}
-
-
-// -------------------------------------------------------
-// ACTUAL MARKET DATA
-// -------------------------------------------------------
-
-document
-.getElementById("marketCommodity")
-.innerText =
-data.commodity ||
-"--";
-
-
-document
-.getElementById("marketState")
-.innerText =
-data.state ||
-"--";
-
-
-document
-.getElementById("marketDistrict")
-.innerText =
-data.district ||
-"--";
-
-
-document
-.getElementById("marketName")
-.innerText =
-data.market ||
-"--";
-
-
-document
-.getElementById("marketDate")
-.innerText =
-data.date ||
-"--";
-
-
-document
-.getElementById("marketVariety")
-.innerText =
-data.variety ||
-"--";
-
-
-document
-.getElementById("minPrice")
-.innerText =
-"₹ " +
-data.min_price;
-
-
-document
-.getElementById("maxPrice")
-.innerText =
-"₹ " +
-data.max_price;
-
-
-document
-.getElementById("modalPrice")
-.innerText =
-"₹ " +
-data.modal_price;
-
-
-// -------------------------------------------------------
-// MODEL PREDICTION
-// -------------------------------------------------------
-
-if(
-data.prediction &&
-data.prediction.status === "ok"
-) {
-
-
-document
-.getElementById("predictedPrice")
-.innerText =
-"₹ " +
-data.prediction
-.predicted_modal_price;
-
-
-document
-.getElementById("marketStatus")
-.innerText =
-"Actual market data and XGBoost prediction loaded.";
-
-
-}
-
-else {
-
-
-document
-.getElementById("predictedPrice")
-.innerText =
-"--";
-
-
-document
-.getElementById("marketStatus")
-.innerText =
-"Market data loaded, but the model could not make a prediction.";
-
-}
-
-
-document
-.getElementById("marketResult")
-.style.display =
-"grid";
-
-})
-
-.catch(error => {
-
-
-console.error(error);
-
-
-document
-.getElementById("marketStatus")
-.innerText =
-"Could not connect to the local server.";
-
-});
-
-}
 
 
 // =========================================================
@@ -1101,9 +1949,18 @@ document
 // =========================================================
 
 setInterval(
-fetchData,
-2000
+    fetchData,
+    2000
 );
+
+
+
+// =========================================================
+// FIRST REQUEST
+// =========================================================
+
+fetchData();
+
 
 </script>
 
